@@ -1,0 +1,181 @@
+<div id='productGallery'>
+    <style>
+
+        @media only screen and (min-width: 100px) {
+
+        }
+
+        .link {
+            color: blue;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .link.active {
+            color: lime;
+        }
+
+        .images-container {
+            border: 1px solid black;
+            width: 100px;
+            padding: 25px;
+            height: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image {
+            position: absolute;
+            left: -100%;
+
+            transition: left 0.5s ease;
+        }
+
+        .image.active {
+            border: 2px solid red;
+            left: 25px;
+        }
+    </style>
+    <div class='links'>
+        <div id='linkTemplate' class='' img-selector='' subtitle='' description=''></div>
+    </div>
+    <div class='images-container'>
+        <div id='imageTemplate' class=''>
+            <img />
+        </div>
+    </div>
+    <div class='subtitle'></div>
+    <div class='description'></div>
+
+    <script type='text/javascript'>
+        window.productJson = [
+            {
+                linkText : 'FEATHER WEIGHT',
+                imageUrl : 'http://placehold.it/100x100',
+                subtitleText : 'Feather Weight',
+                description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+            },
+            {
+                linkText : 'ILLUMINATION',
+                imageUrl : 'http://placehold.it/100x100',
+                subtitleText : 'ILLUMINATION',
+                description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+            },
+            {
+                linkText : 'SMART KNOBS',
+                imageUrl : 'http://placehold.it/100x100',
+                subtitleText : 'Feather Weight',
+                description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+            },
+            {
+                linkText : 'DUAL CHANNEL FLEXIBILITY',
+                imageUrl : 'http://placehold.it/100x100',
+                subtitleText : 'Feather Weight',
+                description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+            },
+            {
+                linkText : 'ULTRA PORTABLE POWER',
+                imageUrl : 'http://placehold.it/100x100',
+                subtitleText : 'Feather Weight',
+                description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+            },
+            {
+                linkText : 'CONNECTIVITY',
+                imageUrl : 'http://placehold.it/100x100',
+                subtitleText : 'Feather Weight',
+                description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+            }
+        ];
+
+        (function() {
+            var productGallery = {
+                start : start,
+                getProductJson : getProductJson,
+                createDomStructure : createDomStructure,
+                addEventListeners : addEventListeners,
+                productJson : null,
+                $container : null
+            };
+
+            function start() {
+                productGallery.productJson = productGallery.getProductJson();
+                productGallery.$container = document.querySelector('#productGallery');
+
+                productGallery.createDomStructure();
+                productGallery.addEventListeners();
+            }
+
+            function getProductJson() {
+                return window.productJson;
+            }
+
+            function createDomStructure() {
+                var $linksArea = productGallery.$container.querySelector('.links'),
+                    $imagesArea = productGallery.$container.querySelector('.images-container'),
+                    linkTemplate = productGallery.$container.querySelector('#linkTemplate'),
+                    imageTemplate = productGallery.$container.querySelector('#imageTemplate');
+
+                for(var i = 0, max = productGallery.productJson.length; i < max; i++) {
+                    var linkElement = linkTemplate.cloneNode(true),
+                        imageElement = imageTemplate.cloneNode(true);
+
+                    linkElement.classList.add('link');
+                    linkElement.setAttribute('img-selector', '#productGalleryImage'+ i);
+                    linkElement.setAttribute('subtitle', productGallery.productJson[i].subtitleText);
+                    linkElement.setAttribute('description', productGallery.productJson[i].description);
+
+                    linkElement.innerText = productGallery.productJson[i].linkText;
+
+                    imageElement.id = 'productGalleryImage'+ i;
+                    imageElement.classList.add('image');
+                    imageElement.querySelector('img').src = productGallery.productJson[i].imageUrl;
+
+                    if(i === 0) {
+                        imageElement.classList.add('active');
+                        linkElement.classList.add('active');
+                    }
+
+                    $linksArea.appendChild(linkElement);
+                    $imagesArea.appendChild(imageElement);
+                }
+
+                linkTemplate.parentElement.removeChild(linkTemplate);
+                imageTemplate.parentElement.removeChild(imageTemplate);
+
+
+            }
+
+            function addEventListeners() {
+                var subtitleNode = productGallery.$container.querySelector('.subtitle'),
+                    descriptionNode = productGallery.$container.querySelector('.description'),
+                    linkNodes = productGallery.$container.querySelectorAll('.link'),
+                    imageNodes = productGallery.$container.querySelectorAll('.image');
+
+                [].forEach.call(linkNodes, function(linkNode) {
+                    linkNode.addEventListener('click', function() {
+                        var imageSelector = linkNode.getAttribute('img-selector'),
+                            subtitle = linkNode.getAttribute('subtitle'),
+                            description = linkNode.getAttribute('description');
+
+                        [].forEach.call(linkNodes, function(linkNode) {
+                            linkNode.classList.remove('active');
+                        });
+
+                        [].forEach.call(imageNodes, function(imageNode) {
+                            imageNode.classList.remove('active');
+                        });
+
+                        linkNode.classList.add('active');
+
+                        productGallery.$container.querySelector(imageSelector)
+                            .classList.add('active');
+
+                        subtitleNode.innerText = subtitle;
+                        descriptionNode.innerText = description;
+                    });
+                });
+            }
+
+            productGallery.start();
+        })();
+    </script>
+</div>
