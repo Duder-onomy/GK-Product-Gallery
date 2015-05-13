@@ -1,5 +1,4 @@
-<div id='productGallery'>
-    <!-- // <script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script> -->
+<div id='productGallery' style='width: 100%;'>
     <style>
 
         @media only screen and (min-width: 100px) {
@@ -9,6 +8,11 @@
         #gkProductGallery {
             width: 800px;
             margin: 0 auto;
+        }
+
+        .links {
+            text-align: center;
+            line-height: 60px;
         }
 
         .link {
@@ -59,36 +63,68 @@
     </div>
 
     <script type='text/javascript'>
-        YUI().use('io', function (Y) {
+        //////////////////////////////////////////////////////////////////
+        var thisGalleriesUrl = '/productgallery/mb-fusion-800';
+        //////////////////////////////////////////////////////////////////
+        YUI().use('io', 'promise', function (Y) {
             var productGallery = {
                 start : start,
                 getProductJson : getProductJson,
                 createDomStructure : createDomStructure,
                 addEventListeners : addEventListeners,
-                productJson : null,
+                products : null,
                 $container : null
             };
 
             function start() {
-                productGallery.productJson = productGallery.getProductJson();
-                productGallery.$container = document.querySelector('#productGallery');
+                // toggleLoadingSpinner();
 
-                productGallery.createDomStructure();
-                productGallery.addEventListeners();
+                productGallery.getProductJson()
+                    .then(function(serverResponse) {
+                        productGallery.products = deserializeServerResponse(serverResponse);
+
+                        productGallery.$container = document.querySelector('#productGallery');
+
+                        productGallery.createDomStructure();
+                        productGallery.addEventListeners();
+
+                        // toggleLoadingSpinner();
+                    }, function() {
+                        document.querySelector('#productGallery').parentElement.removeChild(document.querySelector('#productGallery'));
+                    });
             }
 
             function getProductJson() {
-                Y.io('/productgallery/mb-fusion-800?format=json-pretty', {
-                    on: {
-                        start : function() {},
-                        success: function(transactionId, repsonseObj) {
-                            items = JSON.parse(repsonseObj.response);
-                        },
-                        complete : function() {},
-                        failure : function() {},
-                        end : function() {}
-                    }
+                return new Y.Promise(function (resolve, reject) {
+                    Y.io(thisGalleriesUrl + '?format=json-pretty', {
+                        on: {
+                            start : function() {},
+                            success: function(transactionId, repsonseObj) {
+                                resolve(JSON.parse(repsonseObj.response));
+                            },
+                            complete : function() {},
+                            failure : function() {
+                                reject();
+                            },
+                            end : function() {}
+                        }
+                    });
                 });
+            }
+
+            function deserializeServerResponse(serverResponse) {
+                var products = [];
+
+                serverResponse.items.forEach(function(item) {
+                    products.push({
+                        linkText : item.title,
+                        imageUrl : item.assetUrl,
+                        subtitleText : item.title,
+                        description : item.body
+                    });
+                });
+
+                return products;
             }
 
             function createDomStructure() {
@@ -97,20 +133,21 @@
                     linkTemplate = productGallery.$container.querySelector('#linkTemplate'),
                     imageTemplate = productGallery.$container.querySelector('#imageTemplate');
 
-                for(var i = 0, max = productGallery.productJson.length; i < max; i++) {
+                for(var i = 0, max = productGallery.products.length; i < max; i++) {
                     var linkElement = linkTemplate.cloneNode(true),
                         imageElement = imageTemplate.cloneNode(true);
 
                     linkElement.classList.add('link');
                     linkElement.setAttribute('img-selector', '#productGalleryImage'+ i);
-                    linkElement.setAttribute('subtitle', productGallery.productJson[i].subtitleText);
-                    linkElement.setAttribute('description', productGallery.productJson[i].description);
+                    linkElement.setAttribute('subtitle', productGallery.products[i].subtitleText);
+                    linkElement.setAttribute('description', productGallery.products[i].description);
+                    linkElement.id = '';
 
-                    linkElement.innerText = productGallery.productJson[i].linkText;
+                    linkElement.innerText = productGallery.products[i].linkText;
 
                     imageElement.id = 'productGalleryImage'+ i;
                     imageElement.classList.add('image');
-                    imageElement.querySelector('img').src = productGallery.productJson[i].imageUrl;
+                    imageElement.querySelector('img').src = productGallery.products[i].imageUrl;
 
                     if(i === 0) {
                         imageElement.classList.add('active');
@@ -153,7 +190,7 @@
                             .classList.add('active');
 
                         subtitleNode.innerText = subtitle;
-                        descriptionNode.innerText = description;
+                        descriptionNode.innerHTML = description;
                     });
                 });
             }
@@ -163,43 +200,5 @@
             });
         });
 
-        // window.productJson = [
-        //     {
-        //         linkText : 'FEATHER WEIGHT',
-        //         imageUrl : 'assets/productGallery/mb_fusion/mb_fusion_800_feather_weight.jpg',
-        //         subtitleText : 'Feather Weight',
-        //         description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
-        //     },
-        //     {
-        //         linkText : 'ILLUMINATION',
-        //         imageUrl : 'assets/productGallery/mb_fusion/mb_fusion_800_illumination.jpg',
-        //         subtitleText : 'ILLUMINATION',
-        //         description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
-        //     },
-        //     {
-        //         linkText : 'SMART KNOBS',
-        //         imageUrl : 'assets/productGallery/mb_fusion/mb_fusion_800_smart_knobs.jpg',
-        //         subtitleText : 'Feather Weight',
-        //         description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
-        //     },
-        //     {
-        //         linkText : 'DUAL CHANNEL FLEXIBILITY',
-        //         imageUrl : 'assets/productGallery/mb_fusion/mb_fusion_800_dual_channel.jpg',
-        //         subtitleText : 'Feather Weight',
-        //         description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
-        //     },
-        //     {
-        //         linkText : 'ULTRA PORTABLE POWER',
-        //         imageUrl : 'assets/productGallery/mb_fusion/mb_fusion_800_tubes.jpg',
-        //         subtitleText : 'Feather Weight',
-        //         description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
-        //     },
-        //     {
-        //         linkText : 'CONNECTIVITY',
-        //         imageUrl : 'assets/productGallery/mb_fusion/mb_fusion_800_connectivity.jpg',
-        //         subtitleText : 'Feather Weight',
-        //         description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
-        //     }
-        // ];
     </script>
 </div>
