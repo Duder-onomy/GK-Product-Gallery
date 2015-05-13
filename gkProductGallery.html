@@ -1,8 +1,14 @@
 <div id='productGallery'>
+    <!-- // <script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script> -->
     <style>
 
         @media only screen and (min-width: 100px) {
 
+        }
+
+        #gkProductGallery {
+            width: 800px;
+            margin: 0 auto;
         }
 
         .link {
@@ -15,78 +21,45 @@
         }
 
         .images-container {
-            border: 1px solid black;
-            width: 100px;
-            padding: 25px;
-            height: 100px;
+            width: 100%;
+            height: 400px;
             position: relative;
             overflow: hidden;
         }
 
         .image {
             position: absolute;
-            left: -100%;
+            opacity: 0;
+            height: 400px;
+            width: 100%;
+            transition: opacity 0.5s ease;
+        }
 
-            transition: left 0.5s ease;
+        .image img {
+            height: 400px;
+            width: 800px;
         }
 
         .image.active {
-            border: 2px solid red;
-            left: 25px;
+            opacity: 1;
         }
     </style>
-    <div class='links'>
-        <div id='linkTemplate' class='' img-selector='' subtitle='' description=''></div>
-    </div>
-    <div class='images-container'>
-        <div id='imageTemplate' class=''>
-            <img />
+
+    <div id='gkProductGallery'>
+        <div class='links'>
+            <div id='linkTemplate' class='' img-selector='' subtitle='' description=''></div>
         </div>
+        <div class='images-container'>
+            <div id='imageTemplate' class=''>
+                <img />
+            </div>
+        </div>
+        <div class='subtitle'></div>
+        <div class='description'></div>
     </div>
-    <div class='subtitle'></div>
-    <div class='description'></div>
 
     <script type='text/javascript'>
-        window.productJson = [
-            {
-                linkText : 'FEATHER WEIGHT',
-                imageUrl : 'http://placehold.it/100x100',
-                subtitleText : 'Feather Weight',
-                description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
-            },
-            {
-                linkText : 'ILLUMINATION',
-                imageUrl : 'http://placehold.it/100x100',
-                subtitleText : 'ILLUMINATION',
-                description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
-            },
-            {
-                linkText : 'SMART KNOBS',
-                imageUrl : 'http://placehold.it/100x100',
-                subtitleText : 'Feather Weight',
-                description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
-            },
-            {
-                linkText : 'DUAL CHANNEL FLEXIBILITY',
-                imageUrl : 'http://placehold.it/100x100',
-                subtitleText : 'Feather Weight',
-                description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
-            },
-            {
-                linkText : 'ULTRA PORTABLE POWER',
-                imageUrl : 'http://placehold.it/100x100',
-                subtitleText : 'Feather Weight',
-                description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
-            },
-            {
-                linkText : 'CONNECTIVITY',
-                imageUrl : 'http://placehold.it/100x100',
-                subtitleText : 'Feather Weight',
-                description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
-            }
-        ];
-
-        (function() {
+        YUI().use('io', function (Y) {
             var productGallery = {
                 start : start,
                 getProductJson : getProductJson,
@@ -105,7 +78,17 @@
             }
 
             function getProductJson() {
-                return window.productJson;
+                Y.io('/productgallery/mb-fusion-800?format=json-pretty', {
+                    on: {
+                        start : function() {},
+                        success: function(transactionId, repsonseObj) {
+                            items = JSON.parse(repsonseObj.response);
+                        },
+                        complete : function() {},
+                        failure : function() {},
+                        end : function() {}
+                    }
+                });
             }
 
             function createDomStructure() {
@@ -175,7 +158,48 @@
                 });
             }
 
-            productGallery.start();
-        })();
+            document.addEventListener('DOMContentLoaded', function() {
+                productGallery.start();
+            });
+        });
+
+        // window.productJson = [
+        //     {
+        //         linkText : 'FEATHER WEIGHT',
+        //         imageUrl : 'assets/productGallery/mb_fusion/mb_fusion_800_feather_weight.jpg',
+        //         subtitleText : 'Feather Weight',
+        //         description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+        //     },
+        //     {
+        //         linkText : 'ILLUMINATION',
+        //         imageUrl : 'assets/productGallery/mb_fusion/mb_fusion_800_illumination.jpg',
+        //         subtitleText : 'ILLUMINATION',
+        //         description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+        //     },
+        //     {
+        //         linkText : 'SMART KNOBS',
+        //         imageUrl : 'assets/productGallery/mb_fusion/mb_fusion_800_smart_knobs.jpg',
+        //         subtitleText : 'Feather Weight',
+        //         description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+        //     },
+        //     {
+        //         linkText : 'DUAL CHANNEL FLEXIBILITY',
+        //         imageUrl : 'assets/productGallery/mb_fusion/mb_fusion_800_dual_channel.jpg',
+        //         subtitleText : 'Feather Weight',
+        //         description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+        //     },
+        //     {
+        //         linkText : 'ULTRA PORTABLE POWER',
+        //         imageUrl : 'assets/productGallery/mb_fusion/mb_fusion_800_tubes.jpg',
+        //         subtitleText : 'Feather Weight',
+        //         description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+        //     },
+        //     {
+        //         linkText : 'CONNECTIVITY',
+        //         imageUrl : 'assets/productGallery/mb_fusion/mb_fusion_800_connectivity.jpg',
+        //         subtitleText : 'Feather Weight',
+        //         description : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+        //     }
+        // ];
     </script>
 </div>
