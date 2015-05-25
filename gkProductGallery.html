@@ -6,7 +6,7 @@
         }
 
         #gkProductGallery {
-            width: 800px;
+            width: 100%;
             margin: 0 auto;
         }
 
@@ -16,12 +16,27 @@
         }
 
         .link {
-            color: blue;
             display: inline-block;
             margin-right: 10px;
+            text-transform: uppercase;
+            font-size: 14px;
+            font-family: "proxima-nova";
+            color: #484848;
         }
+
+        .link-bullet {
+            display: inline-block;
+            height: 60px;
+            width: 3px;
+            margin-right: 10px;
+            vertical-align: bottom;
+            background-image: url('https://static1.squarespace.com/static/52d881e0e4b093afad1a2ae2/t/5563a289e4b08b2ebc704d9b/1432593036851/?format=100w&storage=local');
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
         .link.active {
-            color: lime;
+            color: #3156c4;
         }
 
         .images-container {
@@ -41,16 +56,50 @@
 
         .image img {
             height: 400px;
-            width: 800px;
+            width: 100%;
         }
 
         .image.active {
             opacity: 1;
         }
+
+        .subtitle {
+            height: 100px;
+            line-height: 100px;
+
+            min-width: 30%;
+            overflow: hidden;
+            float: left;
+
+            font-family: 'adobe-garamond-pro';
+
+            font-size: 34px;
+            color: #484848;
+        }
+
+        .description-container {
+            height: 100px;
+            line-height: 100px;
+            width: 70%;
+            float: right;
+            display: flex;
+            justify-content: flex-start;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .description {
+            text-align: left;
+            font-size: 19px;
+            line-height: 19px;
+            color: #484848;
+        }
+
     </style>
 
     <div id='gkProductGallery'>
         <div class='links'>
+            <div id='bulletTemplate' class='link-bullet'></div>
             <div id='linkTemplate' class='' img-selector='' subtitle='' description=''></div>
         </div>
         <div class='images-container'>
@@ -59,146 +108,152 @@
             </div>
         </div>
         <div class='subtitle'></div>
-        <div class='description'></div>
+        <div class='description-container'>
+            <div class='description'></div>
+        </div>
     </div>
 
     <script type='text/javascript'>
-        //////////////////////////////////////////////////////////////////
-        var thisGalleriesUrl = '/productgallery/mb-fusion-800';
-        //////////////////////////////////////////////////////////////////
-        YUI().use('io', 'promise', function (Y) {
-            var productGallery = {
-                start : start,
-                getProductJson : getProductJson,
-                createDomStructure : createDomStructure,
-                addEventListeners : addEventListeners,
-                products : null,
-                $container : null
-            };
+        (function(globals) {
+            //////////////////////////////////////////////////////////////////
+            var thisGalleriesUrl = '/productgallery/mb-fusion-800' || globals.thisGalleriesUrl;
+            //////////////////////////////////////////////////////////////////
+            YUI().use('io', 'promise', function (Y) {
+                var productGallery = {
+                    start : start,
+                    getProductJson : getProductJson,
+                    createDomStructure : createDomStructure,
+                    addEventListeners : addEventListeners,
+                    products : null,
+                    $container : null
+                };
 
-            function start() {
-                // toggleLoadingSpinner();
+                function start() {
+                    // toggleLoadingSpinner();
 
-                productGallery.getProductJson()
-                    .then(function(serverResponse) {
-                        productGallery.products = deserializeServerResponse(serverResponse);
+                    productGallery.getProductJson()
+                        .then(function(serverResponse) {
+                            productGallery.products = deserializeServerResponse(serverResponse);
 
-                        productGallery.$container = document.querySelector('#productGallery');
+                            productGallery.$container = document.querySelector('#productGallery');
 
-                        productGallery.createDomStructure();
-                        productGallery.addEventListeners();
+                            productGallery.createDomStructure();
+                            productGallery.addEventListeners();
 
-                        // toggleLoadingSpinner();
-                    }, function() {
-                        document.querySelector('#productGallery').parentElement.removeChild(document.querySelector('#productGallery'));
-                    });
-            }
-
-            function getProductJson() {
-                return new Y.Promise(function (resolve, reject) {
-                    Y.io(thisGalleriesUrl + '?format=json-pretty', {
-                        on: {
-                            start : function() {},
-                            success: function(transactionId, repsonseObj) {
-                                resolve(JSON.parse(repsonseObj.response));
-                            },
-                            complete : function() {},
-                            failure : function() {
-                                reject();
-                            },
-                            end : function() {}
-                        }
-                    });
-                });
-            }
-
-            function deserializeServerResponse(serverResponse) {
-                var products = [];
-
-                serverResponse.items.forEach(function(item) {
-                    products.push({
-                        linkText : item.title,
-                        imageUrl : item.assetUrl,
-                        subtitleText : item.title,
-                        description : item.body
-                    });
-                });
-
-                return products;
-            }
-
-            function createDomStructure() {
-                var $linksArea = productGallery.$container.querySelector('.links'),
-                    $imagesArea = productGallery.$container.querySelector('.images-container'),
-                    linkTemplate = productGallery.$container.querySelector('#linkTemplate'),
-                    imageTemplate = productGallery.$container.querySelector('#imageTemplate');
-
-                for(var i = 0, max = productGallery.products.length; i < max; i++) {
-                    var linkElement = linkTemplate.cloneNode(true),
-                        imageElement = imageTemplate.cloneNode(true);
-
-                    linkElement.classList.add('link');
-                    linkElement.setAttribute('img-selector', '#productGalleryImage'+ i);
-                    linkElement.setAttribute('subtitle', productGallery.products[i].subtitleText);
-                    linkElement.setAttribute('description', productGallery.products[i].description);
-                    linkElement.id = '';
-
-                    linkElement.innerText = productGallery.products[i].linkText;
-
-                    imageElement.id = 'productGalleryImage'+ i;
-                    imageElement.classList.add('image');
-                    imageElement.querySelector('img').src = productGallery.products[i].imageUrl;
-
-                    if(i === 0) {
-                        imageElement.classList.add('active');
-                        linkElement.classList.add('active');
-                    }
-
-                    $linksArea.appendChild(linkElement);
-                    $imagesArea.appendChild(imageElement);
+                            // toggleLoadingSpinner();
+                        }, function() {
+                            document.querySelector('#productGallery').parentElement.removeChild(document.querySelector('#productGallery'));
+                        });
                 }
 
-                linkTemplate.parentElement.removeChild(linkTemplate);
-                imageTemplate.parentElement.removeChild(imageTemplate);
-
-
-            }
-
-            function addEventListeners() {
-                var subtitleNode = productGallery.$container.querySelector('.subtitle'),
-                    descriptionNode = productGallery.$container.querySelector('.description'),
-                    linkNodes = productGallery.$container.querySelectorAll('.link'),
-                    imageNodes = productGallery.$container.querySelectorAll('.image');
-
-                [].forEach.call(linkNodes, function(linkNode) {
-                    linkNode.addEventListener('click', function() {
-                        var imageSelector = linkNode.getAttribute('img-selector'),
-                            subtitle = linkNode.getAttribute('subtitle'),
-                            description = linkNode.getAttribute('description');
-
-                        [].forEach.call(linkNodes, function(linkNode) {
-                            linkNode.classList.remove('active');
+                function getProductJson() {
+                    return new Y.Promise(function (resolve, reject) {
+                        Y.io(thisGalleriesUrl + '?format=json-pretty', {
+                            on: {
+                                start : function() {},
+                                success: function(transactionId, repsonseObj) {
+                                    resolve(JSON.parse(repsonseObj.response));
+                                },
+                                complete : function() {},
+                                failure : reject,
+                                end : function() {}
+                            }
                         });
-
-                        [].forEach.call(imageNodes, function(imageNode) {
-                            imageNode.classList.remove('active');
-                        });
-
-                        linkNode.classList.add('active');
-
-                        productGallery.$container.querySelector(imageSelector)
-                            .classList.add('active');
-
-                        subtitleNode.innerText = subtitle;
-                        descriptionNode.innerHTML = description;
                     });
+                }
+
+                function deserializeServerResponse(serverResponse) {
+                    return serverResponse.items.map(function(item) {
+                        return {
+                            linkText : item.title,
+                            imageUrl : item.assetUrl,
+                            subtitleText : item.title,
+                            description : item.body
+                        };
+                    });
+                }
+
+                function createDomStructure() {
+                    var $linksArea = productGallery.$container.querySelector('.links'),
+                        $imagesArea = productGallery.$container.querySelector('.images-container'),
+                        bulletTemplate = productGallery.$container.querySelector('#bulletTemplate'),
+                        linkTemplate = productGallery.$container.querySelector('#linkTemplate'),
+                        imageTemplate = productGallery.$container.querySelector('#imageTemplate');
+
+                    for(var i = 0, max = productGallery.products.length; i < max; i++) {
+                        var linkElement = linkTemplate.cloneNode(true),
+                            imageElement = imageTemplate.cloneNode(true),
+                            bulletElement = bulletTemplate.cloneNode(true);
+
+                        linkElement.classList.add('link');
+                        linkElement.setAttribute('img-selector', '#productGalleryImage'+ i);
+                        linkElement.setAttribute('subtitle', productGallery.products[i].subtitleText);
+                        linkElement.setAttribute('description', productGallery.products[i].description);
+                        linkElement.id = '';
+
+                        linkElement.innerText = productGallery.products[i].linkText;
+
+                        imageElement.id = 'productGalleryImage'+ i;
+                        imageElement.classList.add('image');
+                        imageElement.querySelector('img').src = productGallery.products[i].imageUrl;
+
+                        if(i === 0) {
+                            imageElement.classList.add('active');
+                            linkElement.classList.add('active');
+
+                            productGallery.$container.querySelector('.subtitle').innerText = productGallery.products[i].subtitleText;
+                            productGallery.$container.querySelector('.description').innerHTML = productGallery.products[i].description;
+                        } else {
+                            bulletElement.id = '';
+                            $linksArea.appendChild(bulletElement);
+                        }
+
+                        $linksArea.appendChild(linkElement);
+                        $imagesArea.appendChild(imageElement);
+                    }
+
+                    linkTemplate.parentElement.removeChild(linkTemplate);
+                    imageTemplate.parentElement.removeChild(imageTemplate);
+                    bulletTemplate.parentElement.removeChild(bulletTemplate);
+
+                }
+
+                function addEventListeners() {
+                    var subtitleNode = productGallery.$container.querySelector('.subtitle'),
+                        descriptionNode = productGallery.$container.querySelector('.description'),
+                        linkNodes = productGallery.$container.querySelectorAll('.link'),
+                        imageNodes = productGallery.$container.querySelectorAll('.image');
+
+                    [].forEach.call(linkNodes, function(linkNode) {
+                        linkNode.addEventListener('click', function() {
+                            var imageSelector = linkNode.getAttribute('img-selector'),
+                                subtitle = linkNode.getAttribute('subtitle'),
+                                description = linkNode.getAttribute('description');
+
+                            [].forEach.call(linkNodes, function(linkNode) {
+                                linkNode.classList.remove('active');
+                            });
+
+                            [].forEach.call(imageNodes, function(imageNode) {
+                                imageNode.classList.remove('active');
+                            });
+
+                            linkNode.classList.add('active');
+
+                            productGallery.$container.querySelector(imageSelector)
+                                .classList.add('active');
+
+                            subtitleNode.innerText = subtitle;
+                            descriptionNode.innerHTML = description;
+                        });
+                    });
+                }
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    productGallery.start();
                 });
-            }
-
-            document.addEventListener('DOMContentLoaded', function() {
-                productGallery.start();
             });
-        });
 
+        })(window);
     </script>
 </div>
