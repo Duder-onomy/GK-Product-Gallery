@@ -109,21 +109,37 @@
         .previous-arrow-container{
             height: 100%;
             line-height: 100%;
+            width: 14px;
             position: absolute;
-            left: 0;
+            left: 10px;
             top: 0;
+            display: flex;
+            align-items: center;
         }
 
         .previous-arrow {
-            font-family: 'squarespace-ui-font';
-            font-style: normal;
-            speak: none;
-            font-weight: normal;
-            -webkit-font-smoothing: antialiased;
-            content: "\e02c";
-            text-align: center;
-            display: inline-block;
-            vertical-align: middle;
+            background-image: url('https://static1.squarespace.com/static/52d881e0e4b093afad1a2ae2/t/5563b61ce4b0b7fb308e00b2/1432598045084/?format=100w&storage=local');
+            background-repeat: no-repeat;
+            width: 14px;
+            height: 24px;
+        }
+
+        .next-arrow-container {
+            height: 100%;
+            line-height: 100%;
+            width: 14px;
+            position: absolute;
+            right: 10px;
+            top: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .next-arrow {
+            background-image: url('https://static1.squarespace.com/static/52d881e0e4b093afad1a2ae2/t/5563b588e4b044d8a276d5b6/1432597896873/?format=100w&storage=local');
+            background-repeat: no-repeat;
+            width: 14px;
+            height: 24px;
         }
 
         .circles {
@@ -196,6 +212,9 @@
         <div class='transport-controls-overlay'>
             <div class='previous-arrow-container'>
                 <div class='previous-arrow'></div>
+            </div>
+            <div class='next-arrow-container'>
+                <div class='next-arrow'></div>
             </div>
 
             <div class='circles'>
