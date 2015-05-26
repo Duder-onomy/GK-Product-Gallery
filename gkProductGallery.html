@@ -16,7 +16,7 @@
             font-size: 46px;
             line-height: 46px;
             font-family: 'adobe-garamond-pro';
-            color: #484848;
+            color: rgba(72, 72, 72, 1);
 
             margin-bottom: 10px
         }
@@ -27,6 +27,8 @@
             margin-left: auto;
             margin-right: auto;
         }
+
+        /*LINKS SECTION*/
 
         .links {
             text-align: center;
@@ -39,7 +41,14 @@
             text-transform: uppercase;
             font-size: 14px;
             font-family: "proxima-nova";
-            color: #484848;
+            color: rgba(72, 72, 72, 1);
+            cursor: pointer;
+
+            transition: color 0.5s ease;
+        }
+
+        .link:hover {
+            color: rgba(72, 72, 72, 0.8);
         }
 
         .link-bullet {
@@ -54,8 +63,14 @@
         }
 
         .link.active {
-            color: #3156c4;
+            color: rgba(49, 86, 196, 1);
         }
+
+        .link.active:hover {
+            color: rgba(49, 86, 196, 0.8)
+        }
+
+        /*IMAGES SECTION*/
 
         .images-container {
             width: 100%;
@@ -80,6 +95,8 @@
         .image.active {
             opacity: 1;
         }
+
+        /*TRANSPORT CONTROLS SECTION */
 
         .transport-controls-overlay {
             width: 100%;
@@ -109,6 +126,30 @@
             vertical-align: middle;
         }
 
+        .circles {
+            text-align: center;
+            bottom: 12px;
+            position: absolute;
+            width: 100%;
+        }
+
+        .circle {
+            height: 12px;
+            width: 12px;
+            display: inline-block;
+            background-image: url('https://static1.squarespace.com/static/52d881e0e4b093afad1a2ae2/t/5563b6d5e4b0ebbd3eaf24bf/1432598229756/?format=100w&storage=local');
+            background-repeat: no-repeat;
+
+            padding-left: 6px;
+            cursor: pointer;
+        }
+
+        .circle.active {
+            background-image: url('https://static1.squarespace.com/static/52d881e0e4b093afad1a2ae2/t/5563b703e4b09a14dbb50a03/1432598276497/?format=100w&storage=local');
+        }
+
+        /*SUBTITLE AND DESCRIPTION SECTION*/
+
         .subtitle-description-container {
             height: 115px;
             line-height: 115px;
@@ -127,7 +168,7 @@
 
             font-size: 34px;
             line-height: 34px;
-            color: #484848;
+            color: rgba(72, 72, 72, 1);
         }
 
         .description {
@@ -135,7 +176,7 @@
             text-align: left;
             font-size: 19px;
             line-height: 19px;
-            color: #484848;
+            color: rgba(72, 72, 72, 1);
         }
 
     </style>
@@ -155,6 +196,10 @@
         <div class='transport-controls-overlay'>
             <div class='previous-arrow-container'>
                 <div class='previous-arrow'></div>
+            </div>
+
+            <div class='circles'>
+                <div id='circleTemplate' class='circle'></div>
             </div>
         </div>
         <div class='subtitle-description-container'>
@@ -215,8 +260,9 @@
                 }
 
                 function deserializeServerResponseProducts(serverResponse) {
-                    return serverResponse.items.map(function(item) {
+                    return serverResponse.items.map(function(item, index) {
                         return {
+                            id : index,
                             linkText : item.title,
                             imageUrl : item.assetUrl,
                             subtitleText : item.title,
@@ -232,79 +278,111 @@
                 function createDomStructure() {
                     var $linksArea = productGallery.$container.querySelector('.links'),
                         $imagesArea = productGallery.$container.querySelector('.images-container'),
+                        $circlesArea = productGallery.$container.querySelector('.circles'),
                         bulletTemplate = productGallery.$container.querySelector('#bulletTemplate'),
+                        circleTemplate = productGallery.$container.querySelector('#circleTemplate'),
                         linkTemplate = productGallery.$container.querySelector('#linkTemplate'),
                         imageTemplate = productGallery.$container.querySelector('#imageTemplate');
 
-                    for(var i = 0, max = productGallery.products.length; i < max; i++) {
+                    productGallery.products.forEach(function(thisProduct, index) {
                         var linkElement = linkTemplate.cloneNode(true),
                             imageElement = imageTemplate.cloneNode(true),
-                            bulletElement = bulletTemplate.cloneNode(true);
+                            bulletElement = bulletTemplate.cloneNode(true),
+                            circleElement = circleTemplate.cloneNode(true);
 
                         linkElement.classList.add('link');
-                        linkElement.setAttribute('img-selector', '#productGalleryImage'+ i);
-                        linkElement.setAttribute('subtitle', productGallery.products[i].subtitleText);
-                        linkElement.setAttribute('description', productGallery.products[i].description);
-                        linkElement.id = '';
+                        linkElement.setAttribute('img-selector', '#productGalleryImage'+ thisProduct.id);
+                        linkElement.setAttribute('subtitle', thisProduct.subtitleText);
+                        linkElement.setAttribute('description', thisProduct.description);
+                        linkElement.id = 'link-' + thisProduct.id;
 
-                        linkElement.innerText = productGallery.products[i].linkText;
+                        linkElement.innerText = thisProduct.linkText;
 
-                        imageElement.id = 'productGalleryImage'+ i;
+                        imageElement.id = 'productGalleryImage'+ thisProduct.id;
                         imageElement.classList.add('image');
-                        imageElement.querySelector('img').src = productGallery.products[i].imageUrl;
+                        imageElement.querySelector('img').src = thisProduct.imageUrl;
 
-                        if(i === 0) {
+                        circleElement.id = 'circle-' + thisProduct.id;
+
+                        if(index === 0) {
                             imageElement.classList.add('active');
                             linkElement.classList.add('active');
+                            circleElement.classList.add('active');
 
-                            productGallery.$container.querySelector('.subtitle').innerText = productGallery.products[i].subtitleText;
-                            productGallery.$container.querySelector('.description').innerHTML = productGallery.products[i].description;
+                            productGallery.$container.querySelector('.subtitle').innerText = thisProduct.subtitleText;
+                            productGallery.$container.querySelector('.description').innerHTML = thisProduct.description;
                         } else {
                             bulletElement.id = '';
                             $linksArea.appendChild(bulletElement);
                         }
 
+                        $circlesArea.appendChild(circleElement);
                         $linksArea.appendChild(linkElement);
                         $imagesArea.appendChild(imageElement);
-                    }
+                    });
 
                     productGallery.$container.querySelector('.gallery-header').innerHTML = productGallery.header;
 
                     linkTemplate.parentElement.removeChild(linkTemplate);
                     imageTemplate.parentElement.removeChild(imageTemplate);
                     bulletTemplate.parentElement.removeChild(bulletTemplate);
-
+                    circleTemplate.parentElement.removeChild(circleTemplate);
                 }
 
                 function addEventListeners() {
                     var subtitleNode = productGallery.$container.querySelector('.subtitle'),
                         descriptionNode = productGallery.$container.querySelector('.description'),
                         linkNodes = productGallery.$container.querySelectorAll('.link'),
-                        imageNodes = productGallery.$container.querySelectorAll('.image');
+                        imageNodes = productGallery.$container.querySelectorAll('.image'),
+                        circleNodes = productGallery.$container.querySelectorAll('.circle');
 
                     [].forEach.call(linkNodes, function(linkNode) {
                         linkNode.addEventListener('click', function() {
-                            var imageSelector = linkNode.getAttribute('img-selector'),
-                                subtitle = linkNode.getAttribute('subtitle'),
-                                description = linkNode.getAttribute('description');
-
-                            [].forEach.call(linkNodes, function(linkNode) {
-                                linkNode.classList.remove('active');
-                            });
-
-                            [].forEach.call(imageNodes, function(imageNode) {
-                                imageNode.classList.remove('active');
-                            });
-
-                            linkNode.classList.add('active');
-
-                            productGallery.$container.querySelector(imageSelector)
-                                .classList.add('active');
-
-                            subtitleNode.innerText = subtitle;
-                            descriptionNode.innerHTML = description;
+                            setProductActive(linkNode.id.split('-')[1]);
                         });
                     });
+
+                    [].forEach.call(circleNodes, function(circleNode) {
+                        circleNode.addEventListener('click', function() {
+                            setProductActive(circleNode.id.split('-')[1]);
+                        });
+                    });
+                }
+
+                function setProductActive(productId) {
+                    var subtitleNode = productGallery.$container.querySelector('.subtitle'),
+                        descriptionNode = productGallery.$container.querySelector('.description'),
+                        linkNodes = productGallery.$container.querySelectorAll('.link'),
+                        imageNodes = productGallery.$container.querySelectorAll('.image'),
+                        circleNodes = productGallery.$container.querySelectorAll('.circle'),
+                        thisProductElement = productGallery.$container.querySelector('#link-'+ productId),
+                        thisProductsCircleElement = productGallery.$container.querySelector('#circle-'+ productId),
+
+                        imageSelector = thisProductElement.getAttribute('img-selector'),
+                        subtitle = thisProductElement.getAttribute('subtitle'),
+                        description = thisProductElement.getAttribute('description');
+
+                    [].forEach.call(linkNodes, function(linkNode) {
+                        linkNode.classList.remove('active');
+                    });
+
+                    [].forEach.call(imageNodes, function(imageNode) {
+                        imageNode.classList.remove('active');
+                    });
+
+                    [].forEach.call(circleNodes, function(circleNode) {
+                        circleNode.classList.remove('active');
+                    });
+
+                    thisProductsCircleElement.classList.add('active');
+
+                    thisProductElement.classList.add('active');
+
+                    productGallery.$container.querySelector(imageSelector)
+                        .classList.add('active');
+
+                    subtitleNode.innerText = subtitle;
+                    descriptionNode.innerHTML = description;
                 }
 
                 document.addEventListener('DOMContentLoaded', function() {
