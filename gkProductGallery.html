@@ -8,6 +8,24 @@
         #gkProductGallery {
             width: 100%;
             margin: 0 auto;
+            position: relative;
+        }
+
+        .gallery-header {
+            text-align: center;
+            font-size: 46px;
+            line-height: 46px;
+            font-family: 'adobe-garamond-pro';
+            color: #484848;
+
+            margin-bottom: 10px
+        }
+
+        .gallery-header-border-bottom {
+            width: 90px;
+            border-bottom: 1px solid rgba(0,0,0,.15);
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .links {
@@ -63,32 +81,57 @@
             opacity: 1;
         }
 
-        .subtitle {
-            height: 100px;
-            line-height: 100px;
-
-            min-width: 30%;
-            overflow: hidden;
-            float: left;
-
-            font-family: 'adobe-garamond-pro';
-
-            font-size: 34px;
-            color: #484848;
+        .transport-controls-overlay {
+            width: 100%;
+            height: 400px;
+            position: absolute;
+            top: 118px;
+            left: 0;
         }
 
-        .description-container {
-            height: 100px;
-            line-height: 100px;
-            width: 70%;
-            float: right;
+        .previous-arrow-container{
+            height: 100%;
+            line-height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .previous-arrow {
+            font-family: 'squarespace-ui-font';
+            font-style: normal;
+            speak: none;
+            font-weight: normal;
+            -webkit-font-smoothing: antialiased;
+            content: "\e02c";
+            text-align: center;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .subtitle-description-container {
+            height: 115px;
+            line-height: 115px;
+
+            width: 100%;
+
             display: flex;
             justify-content: flex-start;
             flex-direction: row;
             align-items: center;
         }
 
+        .subtitle {
+            width: 30%;
+            font-family: 'adobe-garamond-pro';
+
+            font-size: 34px;
+            line-height: 34px;
+            color: #484848;
+        }
+
         .description {
+            width: 70%;
             text-align: left;
             font-size: 19px;
             line-height: 19px;
@@ -98,6 +141,8 @@
     </style>
 
     <div id='gkProductGallery'>
+        <div class='gallery-header'></div>
+        <div class='gallery-header-border-bottom'></div>
         <div class='links'>
             <div id='bulletTemplate' class='link-bullet'></div>
             <div id='linkTemplate' class='' img-selector='' subtitle='' description=''></div>
@@ -107,8 +152,13 @@
                 <img />
             </div>
         </div>
-        <div class='subtitle'></div>
-        <div class='description-container'>
+        <div class='transport-controls-overlay'>
+            <div class='previous-arrow-container'>
+                <div class='previous-arrow'></div>
+            </div>
+        </div>
+        <div class='subtitle-description-container'>
+            <div class='subtitle'></div>
             <div class='description'></div>
         </div>
     </div>
@@ -116,7 +166,7 @@
     <script type='text/javascript'>
         (function(globals) {
             //////////////////////////////////////////////////////////////////
-            var thisGalleriesUrl = '/productgallery/mb-fusion-800' || globals.thisGalleriesUrl;
+            var thisGalleriesUrl = '/product-galleries/mb-fusion-800-design' || globals.thisGalleriesUrl;
             //////////////////////////////////////////////////////////////////
             YUI().use('io', 'promise', function (Y) {
                 var productGallery = {
@@ -124,6 +174,7 @@
                     getProductJson : getProductJson,
                     createDomStructure : createDomStructure,
                     addEventListeners : addEventListeners,
+                    header : null,
                     products : null,
                     $container : null
                 };
@@ -133,7 +184,8 @@
 
                     productGallery.getProductJson()
                         .then(function(serverResponse) {
-                            productGallery.products = deserializeServerResponse(serverResponse);
+                            productGallery.products = deserializeServerResponseProducts(serverResponse);
+                            productGallery.header = deserializeServerResponseHeader(serverResponse);
 
                             productGallery.$container = document.querySelector('#productGallery');
 
@@ -162,7 +214,7 @@
                     });
                 }
 
-                function deserializeServerResponse(serverResponse) {
+                function deserializeServerResponseProducts(serverResponse) {
                     return serverResponse.items.map(function(item) {
                         return {
                             linkText : item.title,
@@ -171,6 +223,10 @@
                             description : item.body
                         };
                     });
+                }
+
+                function deserializeServerResponseHeader(serverResponse) {
+                    return serverResponse.collection.description;
                 }
 
                 function createDomStructure() {
@@ -211,6 +267,8 @@
                         $linksArea.appendChild(linkElement);
                         $imagesArea.appendChild(imageElement);
                     }
+
+                    productGallery.$container.querySelector('.gallery-header').innerHTML = productGallery.header;
 
                     linkTemplate.parentElement.removeChild(linkTemplate);
                     imageTemplate.parentElement.removeChild(imageTemplate);
