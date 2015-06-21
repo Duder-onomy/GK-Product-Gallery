@@ -24,6 +24,11 @@
             margin-right: auto;
         }
 
+        .images-and-descriptions-container {
+            height: 468px;
+            position: relative;
+        }
+
         /*LINKS SECTION*/
 
         .links {
@@ -72,7 +77,7 @@
 
         .images-container {
             width: 100%;
-            height: 400px;
+            height: 353px;
             position: relative;
             overflow: hidden;
         }
@@ -80,15 +85,14 @@
         .image {
             position: absolute;
             opacity: 0;
-            height: 400px;
+            height: 353px;
             width: 100%;
             -webkit-transition: opacity 0.5s ease;
                     transition: opacity 0.5s ease;
-        }
 
-        .image img {
-            height: 400px;
-            width: 100%;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
         }
 
         .image.active {
@@ -99,9 +103,9 @@
 
         .transport-controls-overlay {
             width: 100%;
-            height: 400px;
+            height: 353px;
             position: absolute;
-            top: 118px;
+            top: 0;
             left: 0;
         }
 
@@ -206,7 +210,49 @@
             position: relative;
         }
 
+        #itemTemplate {
+            display : none;
+        }
 
+        .mobile-gallery-header {
+            text-align: center;
+            font-size: 46px;
+            line-height: 46px;
+            font-family: 'adobe-garamond-pro';
+            color: rgba(72, 72, 72, 1);
+
+            margin-bottom: 10px
+        }
+
+        .mobile-gallery-header-border-bottom {
+            width: 90px;
+            border-bottom: 1px solid rgba(0,0,0,.15);
+            margin-left: auto;
+            margin-right: auto;
+
+            margin-bottom: 40px;
+        }
+
+        .mobile-item {
+            margin-bottom: 40px;
+        }
+
+        .mobile-item-header {
+            font-family: 'adobe-garamond-pro';
+
+            font-size: 34px;
+            line-height: 34px;
+            color: rgba(72, 72, 72, 1);
+        }
+        .mobile-item-image {
+
+        }
+        .mobile-item-description {
+            text-align: left;
+            font-size: 19px;
+            line-height: 19px;
+            color: rgba(72, 72, 72, 1);
+        }
 
         /*SUBTITLE AND DESCRIPTION SECTION*/
 
@@ -269,7 +315,7 @@
             /* place CSS for smaller screens */
         }
 
-        @media only screen and (max-width: 480px) {
+        @media only screen and (max-width: 700px) {
             /* place CSS for mobile */
 
             #gkProductGalleryMobile {
@@ -291,31 +337,43 @@
                 <div id="bulletTemplate" class="link-bullet"></div>
                 <div id="linkTemplate" class="" img-selector="" subtitle="" description=""></div>
             </div>
-            <div class="images-container">
-                <div id="imageTemplate" class="">
-                    <img>
-                </div>
-            </div>
-            <div class="transport-controls-overlay">
-                <div class="previous-arrow-container">
-                    <div class="previous-arrow"></div>
-                </div>
-                <div class="next-arrow-container">
-                    <div class="next-arrow"></div>
-                </div>
 
-                <div class="circles">
-                    <div id="circleTemplate" class="circle"></div>
+            <div class="images-and-descriptions-container">
+                <div class="images-container">
+                    <div id="imageTemplate" class=""></div>
                 </div>
-            </div>
-            <div class="subtitle-description-container">
-                <div class="subtitle"></div>
-                <div class="description"></div>
+                <div class="transport-controls-overlay">
+                    <div class="previous-arrow-container">
+                        <div class="previous-arrow"></div>
+                    </div>
+                    <div class="next-arrow-container">
+                        <div class="next-arrow"></div>
+                    </div>
+
+                    <div class="circles">
+                        <div id="circleTemplate" class="circle"></div>
+                    </div>
+                </div>
+                <div class="subtitle-description-container">
+                    <div class="subtitle"></div>
+                    <div class="description"></div>
+                </div>
             </div>
         </div>
 
         <div id="gkProductGalleryMobile">
+            <div class="mobile-gallery-header"></div>
+            <div class="mobile-gallery-header-border-bottom"></div>
 
+            <div id="itemsContainer"></div>
+
+            <div id="itemTemplate">
+                <div class="mobile-item-header"></div>
+                <div class="mobile-item-image">
+                    <img>
+                </div>
+                <div class="mobile-item-description"></div>
+            </div>
         </div>
     </div>
 
@@ -389,6 +447,11 @@
                 }
 
                 function createDomStructure() {
+                    _createDesktopDomStructure();
+                    _createMobileDomStructure();
+                }
+
+                function _createDesktopDomStructure() {
                     var $linksArea = productGallery.$container.querySelector('.links'),
                         $imagesArea = productGallery.$container.querySelector('.images-container'),
                         $circlesArea = productGallery.$container.querySelector('.circles'),
@@ -413,7 +476,7 @@
 
                         imageElement.id = 'productGalleryImage'+ thisProduct.id;
                         imageElement.classList.add('image');
-                        imageElement.querySelector('img').src = thisProduct.imageUrl;
+                        imageElement.style.backgroundImage = 'url('+ thisProduct.imageUrl +')';
 
                         circleElement.id = 'circle-' + thisProduct.id;
 
@@ -442,6 +505,29 @@
                     imageTemplate.parentElement.removeChild(imageTemplate);
                     bulletTemplate.parentElement.removeChild(bulletTemplate);
                     circleTemplate.parentElement.removeChild(circleTemplate);
+                }
+
+                function _createMobileDomStructure() {
+                    var itemsContainer = productGallery.$container.querySelector('#gkProductGalleryMobile').querySelector('#itemsContainer'),
+                        itemTemplate = productGallery.$container.querySelector('#gkProductGalleryMobile').querySelector('#itemTemplate');
+
+                    productGallery.products.forEach(function(thisProduct, index) {
+                        var itemElement = itemTemplate.cloneNode(true);
+
+                        itemElement.classList.add('mobile-item');
+
+                        itemElement.querySelector('.mobile-item-header').innerHTML = thisProduct.subtitleText;
+                        itemElement.querySelector('.mobile-item-image img').src = thisProduct.imageUrl;
+                        itemElement.querySelector('.mobile-item-description').innerHTML = thisProduct.description;
+
+                        itemElement.id = '';
+
+                        itemsContainer.appendChild(itemElement);
+                    });
+
+                    productGallery.$container.querySelector('#gkProductGalleryMobile').querySelector('.mobile-gallery-header').innerHTML = productGallery.header;
+
+                    itemTemplate.parentElement.removeChild(itemTemplate);
                 }
 
                 function addEventListeners() {
