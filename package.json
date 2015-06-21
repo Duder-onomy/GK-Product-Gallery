@@ -1,0 +1,22 @@
+{
+  "name": "gkProductGallery",
+  "version": "0.0.0",
+  "description": "A product gallery for the new Gallien Krueger site.'",
+  "main": "none",
+  "scripts": {
+    "test": "none"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Duder-onomy/GK-Product-Gallery.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Duder-onomy/GK-Product-Gallery/issues"
+  },
+  "homepage": "https://github.com/Duder-onomy/GK-Product-Gallery",
+  "devDependencies": {
+    "html-autoprefixer": "^0.3.7"
+  }
+}

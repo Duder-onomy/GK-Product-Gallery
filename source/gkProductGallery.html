@@ -1,10 +1,6 @@
 <div id='productGallery' style='width: 100%;'>
     <style>
 
-        @media only screen and (min-width: 100px) {
-
-        }
-
         #gkProductGallery {
             width: 100%;
             margin: 0 auto;
@@ -180,6 +176,15 @@
             background-image: url('https://static1.squarespace.com/static/52d881e0e4b093afad1a2ae2/t/5563b703e4b09a14dbb50a03/1432598276497/?format=100w&storage=local');
         }
 
+        /*MOBILE STYLES*/
+        #gkProductGalleryMobile {
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+
+
         /*SUBTITLE AND DESCRIPTION SECTION*/
 
         .subtitle-description-container {
@@ -211,37 +216,70 @@
             color: rgba(72, 72, 72, 1);
         }
 
+        /*BREAKPOINTS*/
+
+        @media only screen and (max-width: 3000px) {
+            /* place CSS for desktop */
+
+            #gkProductGalleryMobile {
+                display: none;
+            }
+        }
+
+        @media only screen and (max-width: 1000px) {
+            /* place CSS for smaller screens */
+        }
+
+        @media only screen and (max-width: 480px) {
+            /* place CSS for mobile */
+
+            #gkProductGalleryMobile {
+                display: block;
+            }
+
+            #gkProductGalleryDesktop {
+                display: none;
+            }
+        }
+
     </style>
 
     <div id='gkProductGallery'>
-        <div class='gallery-header'></div>
-        <div class='gallery-header-border-bottom'></div>
-        <div class='links'>
-            <div id='bulletTemplate' class='link-bullet'></div>
-            <div id='linkTemplate' class='' img-selector='' subtitle='' description=''></div>
-        </div>
-        <div class='images-container'>
-            <div id='imageTemplate' class=''>
-                <img />
+        <div id='gkProductGalleryDesktop'>
+            <div class='gallery-header'></div>
+            <div class='gallery-header-border-bottom'></div>
+            <div class='links'>
+                <div id='bulletTemplate' class='link-bullet'></div>
+                <div id='linkTemplate' class='' img-selector='' subtitle='' description=''></div>
             </div>
-        </div>
-        <div class='transport-controls-overlay'>
-            <div class='previous-arrow-container'>
-                <div class='previous-arrow'></div>
+            <div class='images-container'>
+                <div id='imageTemplate' class=''>
+                    <img />
+                </div>
             </div>
-            <div class='next-arrow-container'>
-                <div class='next-arrow'></div>
-            </div>
+            <div class='transport-controls-overlay'>
+                <div class='previous-arrow-container'>
+                    <div class='previous-arrow'></div>
+                </div>
+                <div class='next-arrow-container'>
+                    <div class='next-arrow'></div>
+                </div>
 
-            <div class='circles'>
-                <div id='circleTemplate' class='circle'></div>
+                <div class='circles'>
+                    <div id='circleTemplate' class='circle'></div>
+                </div>
+            </div>
+            <div class='subtitle-description-container'>
+                <div class='subtitle'></div>
+                <div class='description'></div>
             </div>
         </div>
-        <div class='subtitle-description-container'>
-            <div class='subtitle'></div>
-            <div class='description'></div>
+
+        <div id='gkProductGalleryMobile'>
+
         </div>
     </div>
+
 
     <script type='text/javascript'>
         (function(globals) {
