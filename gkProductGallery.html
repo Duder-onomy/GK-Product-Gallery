@@ -109,12 +109,18 @@
         .previous-arrow-container{
             height: 100%;
             line-height: 100%;
-            width: 14px;
+            width: 28px;
             position: absolute;
-            left: 10px;
+            left: 0;
             top: 0;
             display: flex;
             align-items: center;
+            transition: background 0.5s;
+        }
+
+        .previous-arrow-container:hover {
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
         .previous-arrow {
@@ -122,17 +128,24 @@
             background-repeat: no-repeat;
             width: 14px;
             height: 24px;
+            margin-left: 8px;
         }
 
         .next-arrow-container {
             height: 100%;
             line-height: 100%;
-            width: 14px;
+            width: 28px;
             position: absolute;
-            right: 10px;
+            right: 0;
             top: 0;
             display: flex;
             align-items: center;
+            transition: background 0.5s;
+        }
+
+        .next-arrow-container:hover {
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
         .next-arrow {
@@ -140,6 +153,7 @@
             background-repeat: no-repeat;
             width: 14px;
             height: 24px;
+            margin-left: 8px;
         }
 
         .circles {
@@ -147,6 +161,8 @@
             bottom: 12px;
             position: absolute;
             width: 100%;
+
+            user-select: none;
         }
 
         .circle {
@@ -285,7 +301,8 @@
                             linkText : item.title,
                             imageUrl : item.assetUrl,
                             subtitleText : item.title,
-                            description : item.body
+                            description : item.body,
+                            isActive : false
                         };
                     });
                 }
@@ -330,6 +347,8 @@
 
                             productGallery.$container.querySelector('.subtitle').innerText = thisProduct.subtitleText;
                             productGallery.$container.querySelector('.description').innerHTML = thisProduct.description;
+
+                            thisProduct.isActive = true;
                         } else {
                             bulletElement.id = '';
                             $linksArea.appendChild(bulletElement);
@@ -353,7 +372,9 @@
                         descriptionNode = productGallery.$container.querySelector('.description'),
                         linkNodes = productGallery.$container.querySelectorAll('.link'),
                         imageNodes = productGallery.$container.querySelectorAll('.image'),
-                        circleNodes = productGallery.$container.querySelectorAll('.circle');
+                        circleNodes = productGallery.$container.querySelectorAll('.circle'),
+                        arrowLeftNode = productGallery.$container.querySelector('.previous-arrow-container'),
+                        arrowRightNode = productGallery.$container.querySelector('.next-arrow-container');
 
                     [].forEach.call(linkNodes, function(linkNode) {
                         linkNode.addEventListener('click', function() {
@@ -366,6 +387,10 @@
                             setProductActive(circleNode.id.split('-')[1]);
                         });
                     });
+
+                    arrowLeftNode.addEventListener('click', goToPreviousProduct);
+
+                    arrowRightNode.addEventListener('click', goToNextProduct);
                 }
 
                 function setProductActive(productId) {
@@ -402,6 +427,45 @@
 
                     subtitleNode.innerText = subtitle;
                     descriptionNode.innerHTML = description;
+
+                    productGallery.products.forEach(function(thisProduct) {
+                        thisProduct.isActive = false;
+                        if(thisProduct.id.toString() === productId.toString()) {
+                            thisProduct.isActive = true;
+                        }
+                    });
+                }
+
+                function goToPreviousProduct() {
+                    var productIdToMakeActive;
+
+                    productGallery.products.forEach(function(thisProduct, index) {
+                        if(thisProduct.isActive) {
+                            if(thisProduct.id === 0) { // Its the first one, so go to the last one.
+                                productIdToMakeActive = productGallery.products[productGallery.products.length - 1].id;
+                            } else {
+                                productIdToMakeActive = productGallery.products[index - 1].id;
+                            }
+                        }
+                    });
+
+                    setTimeout(function() { setProductActive(productIdToMakeActive); }, 0);
+                }
+
+                function goToNextProduct() {
+                    var productIdToMakeActive;
+
+                    productGallery.products.forEach(function(thisProduct, index) {
+                        if(thisProduct.isActive) {
+                            if(thisProduct.id === (productGallery.products.length - 1)) { // Its the last one, so go to the first one.
+                                productIdToMakeActive = productGallery.products[0].id;
+                            } else {
+                                productIdToMakeActive = productGallery.products[thisProduct.id + 1].id;
+                            }
+                        }
+                    });
+
+                    setTimeout(function() { setProductActive(productIdToMakeActive); }, 0);
                 }
 
                 document.addEventListener('DOMContentLoaded', function() {
