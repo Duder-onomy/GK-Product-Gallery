@@ -1,1 +1,555 @@
-undefined
+<div id="productGallery" style="width: 100%;">
+    <style>
+
+        #gkProductGallery {
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .gallery-header {
+            text-align: center;
+            font-size: 46px;
+            line-height: 46px;
+            font-family: 'adobe-garamond-pro';
+            color: rgba(72, 72, 72, 1);
+
+            margin-bottom: 10px
+        }
+
+        .gallery-header-border-bottom {
+            width: 90px;
+            border-bottom: 1px solid rgba(0,0,0,.15);
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /*LINKS SECTION*/
+
+        .links {
+            text-align: center;
+            line-height: 60px;
+        }
+
+        .link {
+            display: inline-block;
+            margin-right: 10px;
+            text-transform: uppercase;
+            font-size: 14px;
+            font-family: "proxima-nova";
+            color: rgba(72, 72, 72, 1);
+            cursor: pointer;
+
+            -webkit-transition: color 0.5s ease;
+
+                    transition: color 0.5s ease;
+        }
+
+        .link:hover {
+            color: rgba(72, 72, 72, 0.8);
+        }
+
+        .link-bullet {
+            display: inline-block;
+            height: 60px;
+            width: 3px;
+            margin-right: 10px;
+            vertical-align: bottom;
+            background-image: url('https://static1.squarespace.com/static/52d881e0e4b093afad1a2ae2/t/5563a289e4b08b2ebc704d9b/1432593036851/?format=100w&storage=local');
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .link.active {
+            color: rgba(49, 86, 196, 1);
+        }
+
+        .link.active:hover {
+            color: rgba(49, 86, 196, 0.8)
+        }
+
+        /*IMAGES SECTION*/
+
+        .images-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image {
+            position: absolute;
+            opacity: 0;
+            height: 400px;
+            width: 100%;
+            -webkit-transition: opacity 0.5s ease;
+                    transition: opacity 0.5s ease;
+        }
+
+        .image img {
+            height: 400px;
+            width: 100%;
+        }
+
+        .image.active {
+            opacity: 1;
+        }
+
+        /*TRANSPORT CONTROLS SECTION */
+
+        .transport-controls-overlay {
+            width: 100%;
+            height: 400px;
+            position: absolute;
+            top: 118px;
+            left: 0;
+        }
+
+        .previous-arrow-container{
+            height: 100%;
+            line-height: 100%;
+            width: 28px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+                -ms-flex-align: center;
+                    align-items: center;
+            -webkit-transition: background 0.5s;
+                    transition: background 0.5s;
+        }
+
+        .previous-arrow-container:hover {
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .previous-arrow {
+            background-image: url('https://static1.squarespace.com/static/52d881e0e4b093afad1a2ae2/t/5563b61ce4b0b7fb308e00b2/1432598045084/?format=100w&storage=local');
+            background-repeat: no-repeat;
+            width: 14px;
+            height: 24px;
+            margin-left: 8px;
+        }
+
+        .next-arrow-container {
+            height: 100%;
+            line-height: 100%;
+            width: 28px;
+            position: absolute;
+            right: 0;
+            top: 0;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+                -ms-flex-align: center;
+                    align-items: center;
+            -webkit-transition: background 0.5s;
+                    transition: background 0.5s;
+        }
+
+        .next-arrow-container:hover {
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .next-arrow {
+            background-image: url('https://static1.squarespace.com/static/52d881e0e4b093afad1a2ae2/t/5563b588e4b044d8a276d5b6/1432597896873/?format=100w&storage=local');
+            background-repeat: no-repeat;
+            width: 14px;
+            height: 24px;
+            margin-left: 8px;
+        }
+
+        .circles {
+            text-align: center;
+            bottom: 12px;
+            position: absolute;
+            width: 100%;
+
+            -webkit-user-select: none;
+
+               -moz-user-select: none;
+
+                -ms-user-select: none;
+
+                    user-select: none;
+        }
+
+        .circle {
+            height: 12px;
+            width: 12px;
+            display: inline-block;
+            background-image: url('https://static1.squarespace.com/static/52d881e0e4b093afad1a2ae2/t/5563b6d5e4b0ebbd3eaf24bf/1432598229756/?format=100w&storage=local');
+            background-repeat: no-repeat;
+
+            padding-left: 6px;
+            cursor: pointer;
+        }
+
+        .circle.active {
+            background-image: url('https://static1.squarespace.com/static/52d881e0e4b093afad1a2ae2/t/5563b703e4b09a14dbb50a03/1432598276497/?format=100w&storage=local');
+        }
+
+        /*MOBILE STYLES*/
+        #gkProductGalleryMobile {
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+
+
+        /*SUBTITLE AND DESCRIPTION SECTION*/
+
+        .subtitle-description-container {
+            height: 115px;
+            line-height: 115px;
+
+            width: 100%;
+
+            display: -webkit-box;
+
+            display: -webkit-flex;
+
+            display: -ms-flexbox;
+
+            display: flex;
+            -webkit-box-pack: start;
+            -webkit-justify-content: flex-start;
+                -ms-flex-pack: start;
+                    justify-content: flex-start;
+            -webkit-box-orient: horizontal;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: row;
+                -ms-flex-direction: row;
+                    flex-direction: row;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+                -ms-flex-align: center;
+                    align-items: center;
+        }
+
+        .subtitle {
+            width: 30%;
+            font-family: 'adobe-garamond-pro';
+
+            font-size: 34px;
+            line-height: 34px;
+            color: rgba(72, 72, 72, 1);
+        }
+
+        .description {
+            width: 70%;
+            text-align: left;
+            font-size: 19px;
+            line-height: 19px;
+            color: rgba(72, 72, 72, 1);
+        }
+
+        /*BREAKPOINTS*/
+
+        @media only screen and (max-width: 3000px) {
+            /* place CSS for desktop */
+
+            #gkProductGalleryMobile {
+                display: none;
+            }
+        }
+
+        @media only screen and (max-width: 1000px) {
+            /* place CSS for smaller screens */
+        }
+
+        @media only screen and (max-width: 480px) {
+            /* place CSS for mobile */
+
+            #gkProductGalleryMobile {
+                display: block;
+            }
+
+            #gkProductGalleryDesktop {
+                display: none;
+            }
+        }
+
+    </style>
+
+    <div id="gkProductGallery">
+        <div id="gkProductGalleryDesktop">
+            <div class="gallery-header"></div>
+            <div class="gallery-header-border-bottom"></div>
+            <div class="links">
+                <div id="bulletTemplate" class="link-bullet"></div>
+                <div id="linkTemplate" class="" img-selector="" subtitle="" description=""></div>
+            </div>
+            <div class="images-container">
+                <div id="imageTemplate" class="">
+                    <img>
+                </div>
+            </div>
+            <div class="transport-controls-overlay">
+                <div class="previous-arrow-container">
+                    <div class="previous-arrow"></div>
+                </div>
+                <div class="next-arrow-container">
+                    <div class="next-arrow"></div>
+                </div>
+
+                <div class="circles">
+                    <div id="circleTemplate" class="circle"></div>
+                </div>
+            </div>
+            <div class="subtitle-description-container">
+                <div class="subtitle"></div>
+                <div class="description"></div>
+            </div>
+        </div>
+
+        <div id="gkProductGalleryMobile">
+
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+        (function(globals) {
+            //////////////////////////////////////////////////////////////////
+            var thisGalleriesUrl = '/product-galleries/mb-fusion-800-design' || globals.thisGalleriesUrl;
+            //////////////////////////////////////////////////////////////////
+            YUI().use('io', 'promise', function (Y) {
+                var productGallery = {
+                    start : start,
+                    getProductJson : getProductJson,
+                    createDomStructure : createDomStructure,
+                    addEventListeners : addEventListeners,
+                    header : null,
+                    products : null,
+                    $container : null
+                };
+
+                function start() {
+                    // toggleLoadingSpinner();
+
+                    productGallery.getProductJson()
+                        .then(function(serverResponse) {
+                            productGallery.products = deserializeServerResponseProducts(serverResponse);
+                            productGallery.header = deserializeServerResponseHeader(serverResponse);
+
+                            productGallery.$container = document.querySelector('#productGallery');
+
+                            productGallery.createDomStructure();
+                            productGallery.addEventListeners();
+
+                            // toggleLoadingSpinner();
+                        }, function() {
+                            document.querySelector('#productGallery').parentElement.removeChild(document.querySelector('#productGallery'));
+                        });
+                }
+
+                function getProductJson() {
+                    return new Y.Promise(function (resolve, reject) {
+                        Y.io(thisGalleriesUrl + '?format=json-pretty', {
+                            on: {
+                                start : function() {},
+                                success: function(transactionId, repsonseObj) {
+                                    resolve(JSON.parse(repsonseObj.response));
+                                },
+                                complete : function() {},
+                                failure : reject,
+                                end : function() {}
+                            }
+                        });
+                    });
+                }
+
+                function deserializeServerResponseProducts(serverResponse) {
+                    return serverResponse.items.map(function(item, index) {
+                        return {
+                            id : index,
+                            linkText : item.title,
+                            imageUrl : item.assetUrl,
+                            subtitleText : item.title,
+                            description : item.body,
+                            isActive : false
+                        };
+                    });
+                }
+
+                function deserializeServerResponseHeader(serverResponse) {
+                    return serverResponse.collection.description;
+                }
+
+                function createDomStructure() {
+                    var $linksArea = productGallery.$container.querySelector('.links'),
+                        $imagesArea = productGallery.$container.querySelector('.images-container'),
+                        $circlesArea = productGallery.$container.querySelector('.circles'),
+                        bulletTemplate = productGallery.$container.querySelector('#bulletTemplate'),
+                        circleTemplate = productGallery.$container.querySelector('#circleTemplate'),
+                        linkTemplate = productGallery.$container.querySelector('#linkTemplate'),
+                        imageTemplate = productGallery.$container.querySelector('#imageTemplate');
+
+                    productGallery.products.forEach(function(thisProduct, index) {
+                        var linkElement = linkTemplate.cloneNode(true),
+                            imageElement = imageTemplate.cloneNode(true),
+                            bulletElement = bulletTemplate.cloneNode(true),
+                            circleElement = circleTemplate.cloneNode(true);
+
+                        linkElement.classList.add('link');
+                        linkElement.setAttribute('img-selector', '#productGalleryImage'+ thisProduct.id);
+                        linkElement.setAttribute('subtitle', thisProduct.subtitleText);
+                        linkElement.setAttribute('description', thisProduct.description);
+                        linkElement.id = 'link-' + thisProduct.id;
+
+                        linkElement.innerText = thisProduct.linkText;
+
+                        imageElement.id = 'productGalleryImage'+ thisProduct.id;
+                        imageElement.classList.add('image');
+                        imageElement.querySelector('img').src = thisProduct.imageUrl;
+
+                        circleElement.id = 'circle-' + thisProduct.id;
+
+                        if(index === 0) {
+                            imageElement.classList.add('active');
+                            linkElement.classList.add('active');
+                            circleElement.classList.add('active');
+
+                            productGallery.$container.querySelector('.subtitle').innerText = thisProduct.subtitleText;
+                            productGallery.$container.querySelector('.description').innerHTML = thisProduct.description;
+
+                            thisProduct.isActive = true;
+                        } else {
+                            bulletElement.id = '';
+                            $linksArea.appendChild(bulletElement);
+                        }
+
+                        $circlesArea.appendChild(circleElement);
+                        $linksArea.appendChild(linkElement);
+                        $imagesArea.appendChild(imageElement);
+                    });
+
+                    productGallery.$container.querySelector('.gallery-header').innerHTML = productGallery.header;
+
+                    linkTemplate.parentElement.removeChild(linkTemplate);
+                    imageTemplate.parentElement.removeChild(imageTemplate);
+                    bulletTemplate.parentElement.removeChild(bulletTemplate);
+                    circleTemplate.parentElement.removeChild(circleTemplate);
+                }
+
+                function addEventListeners() {
+                    var subtitleNode = productGallery.$container.querySelector('.subtitle'),
+                        descriptionNode = productGallery.$container.querySelector('.description'),
+                        linkNodes = productGallery.$container.querySelectorAll('.link'),
+                        imageNodes = productGallery.$container.querySelectorAll('.image'),
+                        circleNodes = productGallery.$container.querySelectorAll('.circle'),
+                        arrowLeftNode = productGallery.$container.querySelector('.previous-arrow-container'),
+                        arrowRightNode = productGallery.$container.querySelector('.next-arrow-container');
+
+                    [].forEach.call(linkNodes, function(linkNode) {
+                        linkNode.addEventListener('click', function() {
+                            setProductActive(linkNode.id.split('-')[1]);
+                        });
+                    });
+
+                    [].forEach.call(circleNodes, function(circleNode) {
+                        circleNode.addEventListener('click', function() {
+                            setProductActive(circleNode.id.split('-')[1]);
+                        });
+                    });
+
+                    arrowLeftNode.addEventListener('click', goToPreviousProduct);
+
+                    arrowRightNode.addEventListener('click', goToNextProduct);
+                }
+
+                function setProductActive(productId) {
+                    var subtitleNode = productGallery.$container.querySelector('.subtitle'),
+                        descriptionNode = productGallery.$container.querySelector('.description'),
+                        linkNodes = productGallery.$container.querySelectorAll('.link'),
+                        imageNodes = productGallery.$container.querySelectorAll('.image'),
+                        circleNodes = productGallery.$container.querySelectorAll('.circle'),
+                        thisProductElement = productGallery.$container.querySelector('#link-'+ productId),
+                        thisProductsCircleElement = productGallery.$container.querySelector('#circle-'+ productId),
+
+                        imageSelector = thisProductElement.getAttribute('img-selector'),
+                        subtitle = thisProductElement.getAttribute('subtitle'),
+                        description = thisProductElement.getAttribute('description');
+
+                    [].forEach.call(linkNodes, function(linkNode) {
+                        linkNode.classList.remove('active');
+                    });
+
+                    [].forEach.call(imageNodes, function(imageNode) {
+                        imageNode.classList.remove('active');
+                    });
+
+                    [].forEach.call(circleNodes, function(circleNode) {
+                        circleNode.classList.remove('active');
+                    });
+
+                    thisProductsCircleElement.classList.add('active');
+
+                    thisProductElement.classList.add('active');
+
+                    productGallery.$container.querySelector(imageSelector)
+                        .classList.add('active');
+
+                    subtitleNode.innerText = subtitle;
+                    descriptionNode.innerHTML = description;
+
+                    productGallery.products.forEach(function(thisProduct) {
+                        thisProduct.isActive = false;
+                        if(thisProduct.id.toString() === productId.toString()) {
+                            thisProduct.isActive = true;
+                        }
+                    });
+                }
+
+                function goToPreviousProduct() {
+                    var productIdToMakeActive;
+
+                    productGallery.products.forEach(function(thisProduct, index) {
+                        if(thisProduct.isActive) {
+                            if(thisProduct.id === 0) { // Its the first one, so go to the last one.
+                                productIdToMakeActive = productGallery.products[productGallery.products.length - 1].id;
+                            } else {
+                                productIdToMakeActive = productGallery.products[index - 1].id;
+                            }
+                        }
+                    });
+
+                    setTimeout(function() { setProductActive(productIdToMakeActive); }, 0);
+                }
+
+                function goToNextProduct() {
+                    var productIdToMakeActive;
+
+                    productGallery.products.forEach(function(thisProduct, index) {
+                        if(thisProduct.isActive) {
+                            if(thisProduct.id === (productGallery.products.length - 1)) { // Its the last one, so go to the first one.
+                                productIdToMakeActive = productGallery.products[0].id;
+                            } else {
+                                productIdToMakeActive = productGallery.products[thisProduct.id + 1].id;
+                            }
+                        }
+                    });
+
+                    setTimeout(function() { setProductActive(productIdToMakeActive); }, 0);
+                }
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    productGallery.start();
+                });
+            });
+
+        })(window);
+    </script>
+</div>
