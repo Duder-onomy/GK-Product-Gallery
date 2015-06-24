@@ -1,3 +1,7 @@
+<script>
+    window.thisGalleriesUrl = false;
+</script>
+
 <div id="productGallery" style="width: 100%;">
     <style>
 
@@ -387,7 +391,7 @@
     <script type="text/javascript">
         (function(globals) {
             //////////////////////////////////////////////////////////////////
-            var thisGalleriesUrl = '/product-galleries/mb-fusion-800-design' || globals.thisGalleriesUrl;
+            var thisGalleriesUrl = globals.thisGalleriesUrl || '/product-galleries/mb-fusion-800-design';
             //////////////////////////////////////////////////////////////////
             YUI().use('io', 'promise', function (Y) {
                 var productGallery = {
