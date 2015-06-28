@@ -1,14 +1,18 @@
 <script>
-    window.thisGalleriesUrl = false;
+    window.productGalleries = false;
 </script>
 
 <div id="productGallery" style="width: 100%;">
     <style>
 
-        #gkProductGallery {
+        .gkProductGallery {
             width: 100%;
             margin: 0 auto;
             position: relative;
+        }
+
+        #gkProductGalleryTemplate {
+            display : none;
         }
 
         .gallery-header {
@@ -339,7 +343,7 @@
 
     </style>
 
-    <div id="gkProductGallery">
+    <div id="gkProductGalleryTemplate">
         <div id="gkProductGalleryDesktop">
             <div class="gallery-header"></div>
             <div class="gallery-header-border-bottom"></div>
@@ -391,39 +395,58 @@
     <script type="text/javascript">
         (function(globals) {
             //////////////////////////////////////////////////////////////////
-            var thisGalleriesUrl = globals.thisGalleriesUrl || '/product-galleries/mb-fusion-800-design';
+            var productGalleries = globals.productGalleries || ['/product-galleries/mb-fusion-800-design', '/product-galleries/mb-fusion-800-technology'];
+
+            productGalleries = productGalleries.map(function(productGalleryUrl) {
+                    return {
+                        url : productGalleryUrl,
+                        header : null,
+                        products : null,
+                        $container : null
+                    };
+                });
+
             //////////////////////////////////////////////////////////////////
             YUI().use('io', 'promise', function (Y) {
-                var productGallery = {
+                var galleryBuilder = {
                     start : start,
                     getProductJson : getProductJson,
                     createDomStructure : createDomStructure,
-                    addEventListeners : addEventListeners,
-                    header : null,
-                    products : null,
-                    $container : null
+                    addEventListeners : addEventListeners
                 };
 
                 function start() {
                     // toggleLoadingSpinner();
+                    var galleryTemplate = document.querySelector('#gkProductGalleryTemplate');
 
-                    productGallery.getProductJson()
-                        .then(function(serverResponse) {
-                            productGallery.products = deserializeServerResponseProducts(serverResponse);
-                            productGallery.header = deserializeServerResponseHeader(serverResponse);
+                    Y.Promise.all(productGalleries.forEach(function(thisGallery) {
+                        return galleryBuilder.getProductJson(thisGallery.url)
+                            .then(function(serverResponse) {
+                                thisGallery.products = deserializeServerResponseProducts(serverResponse);
+                                thisGallery.header = deserializeServerResponseHeader(serverResponse);
 
-                            productGallery.$container = document.querySelector('#productGallery');
 
-                            productGallery.createDomStructure();
-                            productGallery.addEventListeners();
+                                thisGallery.$container = galleryTemplate.cloneNode(true);
+                                thisGallery.$container.id = '';
+                                thisGallery.$container.classList.add('gkProductGallery');
 
-                            // toggleLoadingSpinner();
-                        }, function() {
-                            document.querySelector('#productGallery').parentElement.removeChild(document.querySelector('#productGallery'));
-                        });
+                                document.querySelector('#productGallery').appendChild(thisGallery.$container);
+
+                                galleryBuilder.createDomStructure(thisGallery);
+                                galleryBuilder.addEventListeners(thisGallery);
+                            });
+                    }))
+                    .then(function() {
+                        galleryTemplate.parentElement.removeChild(galleryTemplate);
+                    }
+                    // ,
+                    // function() {
+                    //     document.querySelector('#productGallery').parentElement.removeChild(document.querySelector('#productGallery'));
+                    // }
+                    );
                 }
 
-                function getProductJson() {
+                function getProductJson(thisGalleriesUrl) {
                     return new Y.Promise(function (resolve, reject) {
                         Y.io(thisGalleriesUrl + '?format=json-pretty', {
                             on: {
@@ -456,21 +479,21 @@
                     return serverResponse.collection.description;
                 }
 
-                function createDomStructure() {
-                    _createDesktopDomStructure();
-                    _createMobileDomStructure();
+                function createDomStructure(thisGallery) {
+                    _createDesktopDomStructure(thisGallery);
+                    _createMobileDomStructure(thisGallery);
                 }
 
-                function _createDesktopDomStructure() {
-                    var $linksArea = productGallery.$container.querySelector('.links'),
-                        $imagesArea = productGallery.$container.querySelector('.images-container'),
-                        $circlesArea = productGallery.$container.querySelector('.circles'),
-                        bulletTemplate = productGallery.$container.querySelector('#bulletTemplate'),
-                        circleTemplate = productGallery.$container.querySelector('#circleTemplate'),
-                        linkTemplate = productGallery.$container.querySelector('#linkTemplate'),
-                        imageTemplate = productGallery.$container.querySelector('#imageTemplate');
+                function _createDesktopDomStructure(thisGallery) {
+                    var $linksArea = thisGallery.$container.querySelector('.links'),
+                        $imagesArea = thisGallery.$container.querySelector('.images-container'),
+                        $circlesArea = thisGallery.$container.querySelector('.circles'),
+                        bulletTemplate = thisGallery.$container.querySelector('#bulletTemplate'),
+                        circleTemplate = thisGallery.$container.querySelector('#circleTemplate'),
+                        linkTemplate = thisGallery.$container.querySelector('#linkTemplate'),
+                        imageTemplate = thisGallery.$container.querySelector('#imageTemplate');
 
-                    productGallery.products.forEach(function(thisProduct, index) {
+                    thisGallery.products.forEach(function(thisProduct, index) {
                         var linkElement = linkTemplate.cloneNode(true),
                             imageElement = imageTemplate.cloneNode(true),
                             bulletElement = bulletTemplate.cloneNode(true),
@@ -495,8 +518,8 @@
                             linkElement.classList.add('active');
                             circleElement.classList.add('active');
 
-                            productGallery.$container.querySelector('.subtitle').innerText = thisProduct.subtitleText;
-                            productGallery.$container.querySelector('.description').innerHTML = thisProduct.description;
+                            thisGallery.$container.querySelector('.subtitle').innerText = thisProduct.subtitleText;
+                            thisGallery.$container.querySelector('.description').innerHTML = thisProduct.description;
 
                             thisProduct.isActive = true;
                         } else {
@@ -509,7 +532,7 @@
                         $imagesArea.appendChild(imageElement);
                     });
 
-                    productGallery.$container.querySelector('.gallery-header').innerHTML = productGallery.header;
+                    thisGallery.$container.querySelector('.gallery-header').innerHTML = thisGallery.header;
 
                     linkTemplate.parentElement.removeChild(linkTemplate);
                     imageTemplate.parentElement.removeChild(imageTemplate);
@@ -517,11 +540,11 @@
                     circleTemplate.parentElement.removeChild(circleTemplate);
                 }
 
-                function _createMobileDomStructure() {
-                    var itemsContainer = productGallery.$container.querySelector('#gkProductGalleryMobile').querySelector('#itemsContainer'),
-                        itemTemplate = productGallery.$container.querySelector('#gkProductGalleryMobile').querySelector('#itemTemplate');
+                function _createMobileDomStructure(thisGallery) {
+                    var itemsContainer = thisGallery.$container.querySelector('#gkProductGalleryMobile').querySelector('#itemsContainer'),
+                        itemTemplate = thisGallery.$container.querySelector('#gkProductGalleryMobile').querySelector('#itemTemplate');
 
-                    productGallery.products.forEach(function(thisProduct, index) {
+                    thisGallery.products.forEach(function(thisProduct, index) {
                         var itemElement = itemTemplate.cloneNode(true);
 
                         itemElement.classList.add('mobile-item');
@@ -535,45 +558,45 @@
                         itemsContainer.appendChild(itemElement);
                     });
 
-                    productGallery.$container.querySelector('#gkProductGalleryMobile').querySelector('.mobile-gallery-header').innerHTML = productGallery.header;
+                    thisGallery.$container.querySelector('#gkProductGalleryMobile').querySelector('.mobile-gallery-header').innerHTML = thisGallery.header;
 
                     itemTemplate.parentElement.removeChild(itemTemplate);
                 }
 
-                function addEventListeners() {
-                    var subtitleNode = productGallery.$container.querySelector('.subtitle'),
-                        descriptionNode = productGallery.$container.querySelector('.description'),
-                        linkNodes = productGallery.$container.querySelectorAll('.link'),
-                        imageNodes = productGallery.$container.querySelectorAll('.image'),
-                        circleNodes = productGallery.$container.querySelectorAll('.circle'),
-                        arrowLeftNode = productGallery.$container.querySelector('.previous-arrow-container'),
-                        arrowRightNode = productGallery.$container.querySelector('.next-arrow-container');
+                function addEventListeners(thisGallery) {
+                    var subtitleNode = thisGallery.$container.querySelector('.subtitle'),
+                        descriptionNode = thisGallery.$container.querySelector('.description'),
+                        linkNodes = thisGallery.$container.querySelectorAll('.link'),
+                        imageNodes = thisGallery.$container.querySelectorAll('.image'),
+                        circleNodes = thisGallery.$container.querySelectorAll('.circle'),
+                        arrowLeftNode = thisGallery.$container.querySelector('.previous-arrow-container'),
+                        arrowRightNode = thisGallery.$container.querySelector('.next-arrow-container');
 
                     [].forEach.call(linkNodes, function(linkNode) {
                         linkNode.addEventListener('click', function() {
-                            setProductActive(linkNode.id.split('-')[1]);
+                            setProductActive(thisGallery, linkNode.id.split('-')[1]);
                         });
                     });
 
                     [].forEach.call(circleNodes, function(circleNode) {
                         circleNode.addEventListener('click', function() {
-                            setProductActive(circleNode.id.split('-')[1]);
+                            setProductActive(thisGallery, circleNode.id.split('-')[1]);
                         });
                     });
 
-                    arrowLeftNode.addEventListener('click', goToPreviousProduct);
+                    arrowLeftNode.addEventListener('click', goToPreviousProduct.bind(null, thisGallery));
 
-                    arrowRightNode.addEventListener('click', goToNextProduct);
+                    arrowRightNode.addEventListener('click', goToNextProduct.bind(null, thisGallery));
                 }
 
-                function setProductActive(productId) {
-                    var subtitleNode = productGallery.$container.querySelector('.subtitle'),
-                        descriptionNode = productGallery.$container.querySelector('.description'),
-                        linkNodes = productGallery.$container.querySelectorAll('.link'),
-                        imageNodes = productGallery.$container.querySelectorAll('.image'),
-                        circleNodes = productGallery.$container.querySelectorAll('.circle'),
-                        thisProductElement = productGallery.$container.querySelector('#link-'+ productId),
-                        thisProductsCircleElement = productGallery.$container.querySelector('#circle-'+ productId),
+                function setProductActive(thisGallery, productId) {
+                    var subtitleNode = thisGallery.$container.querySelector('.subtitle'),
+                        descriptionNode = thisGallery.$container.querySelector('.description'),
+                        linkNodes = thisGallery.$container.querySelectorAll('.link'),
+                        imageNodes = thisGallery.$container.querySelectorAll('.image'),
+                        circleNodes = thisGallery.$container.querySelectorAll('.circle'),
+                        thisProductElement = thisGallery.$container.querySelector('#link-'+ productId),
+                        thisProductsCircleElement = thisGallery.$container.querySelector('#circle-'+ productId),
 
                         imageSelector = thisProductElement.getAttribute('img-selector'),
                         subtitle = thisProductElement.getAttribute('subtitle'),
@@ -595,13 +618,13 @@
 
                     thisProductElement.classList.add('active');
 
-                    productGallery.$container.querySelector(imageSelector)
+                    thisGallery.$container.querySelector(imageSelector)
                         .classList.add('active');
 
                     subtitleNode.innerText = subtitle;
                     descriptionNode.innerHTML = description;
 
-                    productGallery.products.forEach(function(thisProduct) {
+                    thisGallery.products.forEach(function(thisProduct) {
                         thisProduct.isActive = false;
                         if(thisProduct.id.toString() === productId.toString()) {
                             thisProduct.isActive = true;
@@ -609,40 +632,40 @@
                     });
                 }
 
-                function goToPreviousProduct() {
+                function goToPreviousProduct(thisGallery) {
                     var productIdToMakeActive;
 
-                    productGallery.products.forEach(function(thisProduct, index) {
+                    thisGallery.products.forEach(function(thisProduct, index) {
                         if(thisProduct.isActive) {
                             if(thisProduct.id === 0) { // Its the first one, so go to the last one.
-                                productIdToMakeActive = productGallery.products[productGallery.products.length - 1].id;
+                                productIdToMakeActive = thisGallery.products[thisGallery.products.length - 1].id;
                             } else {
-                                productIdToMakeActive = productGallery.products[index - 1].id;
+                                productIdToMakeActive = thisGallery.products[index - 1].id;
                             }
                         }
                     });
 
-                    setTimeout(function() { setProductActive(productIdToMakeActive); }, 0);
+                    setTimeout(function() { setProductActive(thisGallery, productIdToMakeActive); }, 0);
                 }
 
-                function goToNextProduct() {
+                function goToNextProduct(thisGallery) {
                     var productIdToMakeActive;
 
-                    productGallery.products.forEach(function(thisProduct, index) {
+                    thisGallery.products.forEach(function(thisProduct, index) {
                         if(thisProduct.isActive) {
-                            if(thisProduct.id === (productGallery.products.length - 1)) { // Its the last one, so go to the first one.
-                                productIdToMakeActive = productGallery.products[0].id;
+                            if(thisProduct.id === (thisGallery.products.length - 1)) { // Its the last one, so go to the first one.
+                                productIdToMakeActive = thisGallery.products[0].id;
                             } else {
-                                productIdToMakeActive = productGallery.products[thisProduct.id + 1].id;
+                                productIdToMakeActive = thisGallery.products[thisProduct.id + 1].id;
                             }
                         }
                     });
 
-                    setTimeout(function() { setProductActive(productIdToMakeActive); }, 0);
+                    setTimeout(function() { setProductActive(thisGallery, productIdToMakeActive); }, 0);
                 }
 
                 document.addEventListener('DOMContentLoaded', function() {
-                    productGallery.start();
+                    galleryBuilder.start();
                 });
             });
 
