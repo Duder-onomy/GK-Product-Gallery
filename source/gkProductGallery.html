@@ -2,7 +2,7 @@
     window.productGalleries = false;
 </script>
 
-<div id='productGallery' style='width: 100%;'>
+<div id='productGallery' style='width: 100%; position: relative;'>
     <style>
 
         .gkProductGallery {
@@ -23,6 +23,10 @@
             color: rgba(72, 72, 72, 1);
 
             margin-bottom: 10px
+        }
+
+        .gallery-header p {
+            margin: 0;
         }
 
         .gallery-header-border-bottom {
@@ -276,6 +280,17 @@
             color: rgba(72, 72, 72, 1);
         }
 
+        /*LOADING OVERLAY*/
+        .loading-overlay {
+            position: absolute;
+            display : inline-block;
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+            top: 0;
+            background-color: #F0F0F0;
+        }
+
         /*BREAKPOINTS*/
 
         @media only screen and (max-width: 3000px) {
@@ -284,10 +299,18 @@
             #gkProductGalleryMobile {
                 display: none;
             }
+
+            .gkProductGallery {
+                min-height: 586px;
+            }
         }
 
         @media only screen and (max-width: 1000px) {
             /* place CSS for smaller screens */
+
+            .gkProductGallery {
+                min-height: 647px;
+            }
         }
 
         @media only screen and (max-width: 700px) {
@@ -352,6 +375,7 @@
         </div>
     </div>
 
+    <div class='loading-overlay'></div>
 
     <script type='text/javascript'>
         (function(globals) {
@@ -368,7 +392,7 @@
                 });
 
             //////////////////////////////////////////////////////////////////
-            YUI().use('io', 'promise', function (Y) {
+            YUI().use('io', 'promise', 'anim', function (Y) {
                 var galleryBuilder = {
                     start : start,
                     getProductJson : getProductJson,
@@ -377,10 +401,13 @@
                 };
 
                 function start() {
-                    // toggleLoadingSpinner();
+                    console.log('start');
+
+                    showLoadingOverlay();
+
                     var galleryTemplate = document.querySelector('#gkProductGalleryTemplate');
 
-                    Y.Promise.all(productGalleries.forEach(function(thisGallery) {
+                    Y.Promise.all(productGalleries.map(function(thisGallery) {
                         return galleryBuilder.getProductJson(thisGallery.url)
                             .then(function(serverResponse) {
                                 thisGallery.products = deserializeServerResponseProducts(serverResponse);
@@ -399,12 +426,12 @@
                     }))
                     .then(function() {
                         galleryTemplate.parentElement.removeChild(galleryTemplate);
-                    }
-                    // ,
-                    // function() {
-                    //     document.querySelector('#productGallery').parentElement.removeChild(document.querySelector('#productGallery'));
-                    // }
-                    );
+                        hideLoadingOverlay();
+                    })
+                    .catch(function() {
+                        window.console.log('everything failed, remove myself from the dom.');
+                        document.querySelector('#productGallery').parentElement.removeChild(document.querySelector('#productGallery'));
+                    });
                 }
 
                 function getProductJson(thisGalleriesUrl) {
@@ -466,7 +493,7 @@
                         linkElement.setAttribute('description', thisProduct.description);
                         linkElement.id = 'link-' + thisProduct.id;
 
-                        linkElement.innerText = thisProduct.linkText;
+                        linkElement.innerHTML = thisProduct.linkText;
 
                         imageElement.id = 'productGalleryImage'+ thisProduct.id;
                         imageElement.classList.add('image');
@@ -479,7 +506,7 @@
                             linkElement.classList.add('active');
                             circleElement.classList.add('active');
 
-                            thisGallery.$container.querySelector('.subtitle').innerText = thisProduct.subtitleText;
+                            thisGallery.$container.querySelector('.subtitle').innerHTML = thisProduct.subtitleText;
                             thisGallery.$container.querySelector('.description').innerHTML = thisProduct.description;
 
                             thisProduct.isActive = true;
@@ -623,6 +650,26 @@
                     });
 
                     setTimeout(function() { setProductActive(thisGallery, productIdToMakeActive); }, 0);
+                }
+
+                function showLoadingOverlay() {
+                    // is shown by default;
+                }
+
+                function hideLoadingOverlay() {
+                    var animation = new Y.Anim({
+                        node: '.loading-overlay',
+                        to: {
+                            opacity: 0,
+                            display: 'none'
+                        }
+                    });
+
+                    animation.run();
+
+                    animation.on('end', function() {
+                        myAnim.get('node').height(0);
+                    });
                 }
 
                 document.addEventListener('DOMContentLoaded', function() {
