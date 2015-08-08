@@ -330,6 +330,10 @@
             background-color: #F0F0F0;
         }
 
+        .height-zero {
+            height: 0;
+        }
+
         /*BREAKPOINTS*/
 
         @media only screen and (max-width: 3000px) {
@@ -421,9 +425,10 @@
             //////////////////////////////////////////////////////////////////
             var productGalleries = globals.productGalleries || ['/product-galleries/mb-fusion-800-design', '/product-galleries/mb-fusion-800-technology'];
 
-            productGalleries = productGalleries.map(function(productGalleryUrl) {
+            productGalleries = productGalleries.map(function(productGalleryUrl, index) {
                     return {
                         url : productGalleryUrl,
+                        index : index,
                         header : null,
                         products : null,
                         $container : null
@@ -457,7 +462,11 @@
                                 thisGallery.$container.id = '';
                                 thisGallery.$container.classList.add('gkProductGallery');
 
-                                document.querySelector('#productGallery').appendChild(thisGallery.$container);
+                                if(thisGallery.index === 0) {
+                                    document.querySelector('#productGallery').insertBefore(thisGallery.$container, document.querySelector('#productGallery').firstChild);
+                                } else {
+                                    document.querySelector('#productGallery').appendChild(thisGallery.$container);
+                                }
 
                                 galleryBuilder.createDomStructure(thisGallery);
                                 galleryBuilder.addEventListeners(thisGallery);
@@ -707,7 +716,7 @@
                     animation.run();
 
                     animation.on('end', function() {
-                        myAnim.get('node').height(0);
+                        animation.get('node').addClass('height-zero');
                     });
                 }
 
